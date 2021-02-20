@@ -8,7 +8,7 @@ const jsonBodyParser = express.json()
 authRouter
     .route('/token')
     .post(jsonBodyParser, async (req, res, next) => {
-        const { phoneNumber, password } = req.body
+        const { phone_number, password } = req.body
         const loginUser = { phoneNumber, password }
 
         for (const [key, value] of Object.entries(loginUser))
@@ -20,7 +20,7 @@ authRouter
         try {
             const dbUser = await AuthService.getUserWithPhoneNumber(
                 req.app.get('db'),
-                loginUser.username
+                loginUser.phone_number
             )
 
             if (!dbUser)
@@ -38,10 +38,10 @@ authRouter
                     error: 'Incorrect username or pw',
                 })
 
-            const sub = dbUser.phoneNumber
+            const sub = dbUser.phone_number
             const payload = {
                 user_id: dbUser.id,
-                phoneNumber: dbUser.phone_number
+                phone_number: dbUser.phone_number
             }
             res.send({
                 authToken: AuthService.createJwt(sub, payload),
@@ -52,10 +52,10 @@ authRouter
     })
 
     .put(requireAuth, (req, res) => {
-        const sub = req.user.phone_number
+        const sub = req.users.phone_number
         const payload = {
-            user_id: req.user.id,
-            phoneNumber: req.user.phone_number,        
+            user_id: req.users.id,
+            phoneNumber: req.users.phone_number,        
         }
         res.send({
             authToken: AuthService.createJwt(sub, payload)

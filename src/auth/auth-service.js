@@ -4,8 +4,8 @@ const config = require('../config')
 
 const AuthService = {
     getUserWithPhoneNumber(db, phoneNumber) {
-        return db('user')
-            .where({ phoneNumber })
+        return db('users')
+            .where({ phone_number })
             .first()
     },
 
