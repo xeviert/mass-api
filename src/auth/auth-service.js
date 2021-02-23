@@ -1,9 +1,9 @@
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const config = require('../config')
 
 const AuthService = {
-    getUserWithPhoneNumber(db, phoneNumber) {
+    getUserWithPhoneNumber(db, phone_number) {
         return db('users')
             .where({ phone_number })
             .first()

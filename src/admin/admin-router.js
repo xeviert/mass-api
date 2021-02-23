@@ -7,7 +7,6 @@ const adminRouter = express.Router()
 adminRouter
     .route('/orders')
     .get((req, res, next) => {
-        // gets all wishlist orders from admin
         AdminService.getAllOrders(req.app.get('db'))
             .then(orders => {
                 res.json(orders)
@@ -16,9 +15,9 @@ adminRouter
     })
 
 adminRouter
-    .route('/orders/:order_id')
+    .route('/orders/:id')
     .all((req, res, next) => {
-        AdminService.getById(req.app.get('db'), req.params.note_id)
+        AdminService.getById(req.app.get('db'), req.params.id)
             .then((order) => {
                 if (!order) {
                     return res.status(404).json({
@@ -31,7 +30,10 @@ adminRouter
             .catch(next)
     })
     .delete((req, res, next) => {
-        AdminService.deleteOrder(req.app.get('db'), req.params.order_id)
+        AdminService.deleteOrder(
+            req.app.get('db'), 
+            req.params.id
+        )
             .then(() => {
                 res.status(204).end()
             })

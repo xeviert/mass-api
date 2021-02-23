@@ -7,9 +7,9 @@ const jsonBodyParser = express.json()
 
 userRouter
     .post('/', jsonBodyParser, async (req, res, next) => {
-        const { password, phoneNumber, name } = req.body
+        const { password, phone_number } = req.body
 
-        for (const field of ['phoneNumber', 'password'])
+        for (const field of ['phone_number', 'password'])
             if (!req.body[field])
                 return res.status(400).json({
                     error: `Missing '${field}' in request body`
@@ -22,13 +22,13 @@ userRouter
 
             const hasUserWithPhoneNumber = await UserService.hasUserWithPhoneNumber(
                 req.app.get('db'),
-                phoneNumber
+                phone_number
             )
 
             if (hasUserWithPhoneNumber)
                 return res.status(400).json({ error: `Phone number already tied to an existing account` })
 
-            const hashPassword = await UserService.hashPassword(password)
+            const hashedPassword = await UserService.hashPassword(password)
 
             const newUser = {
                 phone_number,

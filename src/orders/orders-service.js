@@ -1,11 +1,12 @@
 const OrdersService = {
+
     getAllOrders(db) {
         return db('orders')
             .select('*')
             .from('favors')
     },
 
-    insertOrder(db, newOrder) {
+    insertOrder (db, newOrder) {
         return db
             .insert(newOrder)
             .into('orders')
@@ -13,12 +14,19 @@ const OrdersService = {
             .then(rows => {
                 return rows[0]
             })
+
     },
 
-    serializeOrder(order) {
-        return {
-            order_id: order.order_id,
-            
-        }
-    }
+    insertOrderItems(db, item) {
+        return db
+            .insert(item)
+            .into('order_items')
+            .returning('*')
+            .then(rows => {
+                return rows[0]
+            })
+    },
+    
 }
+
+module.exports = OrdersService

@@ -23,7 +23,7 @@ app.use('/api/orders', ordersRouter)
 app.use('/api/admin', adminRouter)
 
 app.get('/', (req, res) => {
-  res.send('Hello, boilerplate!')
+  res.send('Hello, MASS!')
 });
 
 app.use(function errorHandler(error, req, res, next) {

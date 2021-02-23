@@ -9,7 +9,7 @@ authRouter
     .route('/token')
     .post(jsonBodyParser, async (req, res, next) => {
         const { phone_number, password } = req.body
-        const loginUser = { phoneNumber, password }
+        const loginUser = { phone_number, password }
 
         for (const [key, value] of Object.entries(loginUser))
             if (value == null)
@@ -55,7 +55,7 @@ authRouter
         const sub = req.users.phone_number
         const payload = {
             user_id: req.users.id,
-            phoneNumber: req.users.phone_number,        
+            phone_number: req.users.phone_number,        
         }
         res.send({
             authToken: AuthService.createJwt(sub, payload)

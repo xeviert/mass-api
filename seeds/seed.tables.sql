@@ -1,19 +1,19 @@
 BEGIN;
 
-TRUNCATE
-    'users';
+-- TRUNCATE users;
 
-INSERT INTO 'users' ('id', 'phone_number', 'password', 'role')
-VALUES
-    (
-        1,
-        '+17132575582',
-        -- password = "pass"
-        '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG',
-        'admin'
-    );
+-- INSERT INTO users 
+--     (id, phone_number, password, role)
+-- VALUES
+--     (
+--         1,
+--         '+17132575582',
+--         -- password = "pass"
+--         '$2b$12$hxi1/Mt/43VF4RIy7lwEEeNgHrVe0XshQD0a7OPeCC85yiQn88vg.',
+--         'admin'
+--     );
 
-INSERT INTO 'items' ('id', 'product')
+INSERT INTO items (id, product)
 VALUES
     (1, 'snack kit'),
     (2, 'socks and underwear'),

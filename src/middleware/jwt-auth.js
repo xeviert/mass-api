@@ -21,6 +21,12 @@ async function requireAuth(req, res, next) {
 
         if (!user)
             return res.status(401).json({ error: 'Unauthorized request'})
+        
+        req.user = user
+        next()
+    } catch (error) {
+        if (error instanceof JsonWebTokenError)
+            return res.status(401).json({ error: 'Unauthorized Request'})
 
         next(error)
     }

@@ -1,11 +1,11 @@
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcrypt')
 
 const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/
 
 const UserService = {
-    hasUserWithPhoneNumber(db, phoneNumber) {
-        return db('user')
-            .where({ phoneNumber })
+    hasUserWithPhoneNumber(db, phone_number) {
+        return db('users')
+            .where({ phone_number })
             .first()
             .then(user => !!user)
     },
@@ -13,25 +13,17 @@ const UserService = {
     insertUser(db, newUser) {
         return db
             .insert(newUser)
-            .into('user')
-            .returning('*')
-            .then(([user]) => user)
-    },
-
-    insertUser(db, newUser) {
-        return db
-            .insert(newUser)
-            .into('user')
+            .into('users')
             .returning('*')
             .then(([user]) => user)
     },
 
     validatePassword(password) {
         if (password.length < 8) {
-            return 'Password be longer than 8 characters'
+            return 'Password must be longer than 8 characters'
           }
           if (password.length > 72) {
-            return 'Password be less than 72 characters'
+            return 'Password must be less than 72 characters'
           }
           if (password.startsWith(' ') || password.endsWith(' ')) {
             return 'Password must not start or end with empty spaces'
