@@ -1,7 +1,15 @@
-require('dotenv').config();
-const { expect } = require("chai");
-const supertest = require("supertest");
+process.env.TZ = 'UCT'
+process.env.NODE_ENV = 'test'
+process.env.JWT_SECRET = 'test-jwt-secret'
+process.env.JWT_EXPIRY = '3m'
 
+require('dotenv').config()
 
-global.expect = expect;
-global.supertest = supertest;
+process.env.TEST_DATABASE_URL = process.env.TEST_DATABASE_URL
+  || "postgresql://postgres@localhost/mass-test"
+
+const { expect } = require('chai')
+const supertest = require('supertest')
+
+global.expect = expect
+global.supertest = supertest

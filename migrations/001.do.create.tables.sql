@@ -7,7 +7,7 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     phone_number TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
-    role TEXT DEFAULT NULL
+    role TEXT NULL
 );
 
 CREATE TABLE items (

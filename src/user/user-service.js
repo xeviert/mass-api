@@ -1,49 +1,49 @@
-const bcrypt = require('bcrypt')
+const bcrypt = require("bcrypt");
 
-const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/
+const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/;
 
 const UserService = {
-    hasUserWithPhoneNumber(db, phone_number) {
-        return db('users')
-            .where({ phone_number })
-            .first()
-            .then(user => !!user)
-    },
+  hasUserWithPhoneNumber(db, phone_number) {
+    return db("users")
+      .where({ phone_number })
+      .first()
+      .then((user) => !!user);
+  },
 
-    insertUser(db, newUser) {
-        return db
-            .insert(newUser)
-            .into('users')
-            .returning('*')
-            .then(([user]) => user)
-    },
+  insertUser(db, newUser) {
+    return db
+      .insert(newUser)
+      .into("users")
+      .returning("*")
+      .then(([user]) => user);
+  },
 
-    validatePassword(password) {
-        if (password.length < 8) {
-            return 'Password must be longer than 8 characters'
-          }
-          if (password.length > 72) {
-            return 'Password must be less than 72 characters'
-          }
-          if (password.startsWith(' ') || password.endsWith(' ')) {
-            return 'Password must not start or end with empty spaces'
-          }
-          if (!REGEX_UPPER_LOWER_NUMBER_SPECIAL.test(password)) {
-            return 'Password must contain one upper case, lower case, number and special character'
-          }
-          return null
-    },
+  validatePassword(password) {
+    // if (password.length < 8) {
+    //   return "Password must be longer than 8 characters";
+    // }
+    // if (password.length > 72) {
+    //   return "Password must be less than 72 characters";
+    // }
+    // if (password.startsWith(" ") || password.endsWith(" ")) {
+    //   return "Password must not start or end with empty spaces";
+    // }
+    // if (!REGEX_UPPER_LOWER_NUMBER_SPECIAL.test(password)) {
+    //   return "Password must contain one upper case, lower case, number and special character";
+    // }
+    return null;
+  },
 
-    hashPassword(password) {
-        return bcrypt.hash(password, 12)
-    },
+  hashPassword(password) {
+    return bcrypt.hash(password, 12);
+  },
 
-    serializeUser(user) {
-        return {
-            id: user.id,
-            phoneNumber: user.phone_number,
-        }
-    },
-}
+  serializeUser(user) {
+    return {
+      id: user.id,
+      phone_number: user.phone_number,
+    };
+  },
+};
 
-module.exports = UserService
+module.exports = UserService;

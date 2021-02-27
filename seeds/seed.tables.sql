@@ -1,36 +1,23 @@
 BEGIN;
 
--- TRUNCATE users;
-
--- INSERT INTO users 
---     (id, phone_number, password, role)
--- VALUES
---     (
---         1,
---         '+17132575582',
---         -- password = "pass"
---         '$2b$12$hxi1/Mt/43VF4RIy7lwEEeNgHrVe0XshQD0a7OPeCC85yiQn88vg.',
---         'admin'
---     );
-
 INSERT INTO items (id, product)
 VALUES
-    (1, 'snack kit'),
-    (2, 'socks and underwear'),
-    (3, 'walking shoes'),
-    (4, 'pads/tampons'),
-    (5, 'first aid kit'),
-    (6, 'dental care kit'),
-    (7, 'deodorant and soap'),        
-    (8, 'earplugs'),
-    (9, 'face mask, sanitizer, gloves'),
-    (10, 'blanket'),
-    (11, 'diapers, wipes, baby clothes'),
-    (12, 'baby formula'),
-    (13, 'school supplies'),
-    (14, 'notepad, pens'),
-    (15, 'hat, gloves, scarve'),
-    (16, 'sweater/jacket');
+    (1, 'Snack Kit'),
+    (2, 'Socks and Underwear'),
+    (3, 'Walking Shoes'),
+    (4, 'Pads/Tampons'),
+    (5, 'First Aid Kit'),
+    (6, 'Dental Care Kit'),
+    (7, 'Deodorant and Soap'),        
+    (8, 'Earplugs'),
+    (9, 'Face Mask, Sanitizer, Gloves'),
+    (10, 'Blanket'),
+    (11, 'Diapers, Wipes, Baby Clothes'),
+    (12, 'Baby Formula'),
+    (13, 'School Supplies'),
+    (14, 'Notepad and Pens'),
+    (15, 'Hat, Gloves, Scarve'),
+    (16, 'Sweater/Jacket');
 
 
 COMMIT;
