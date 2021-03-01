@@ -1,4 +1,4 @@
-# MASS API
+# MASS API - Mutual Aid & Shared Services
 
 ## Created for [MASS Client](https://mass-client.vercel.app)
 
