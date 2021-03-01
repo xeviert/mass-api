@@ -1,35 +1,24 @@
-# EXPRESS BOILERPLATE
+# MASS API
 
-### Get your Express project up and running easily with this boilerplate
+## Created for [MASS Client]()
 
----
-
-## Set up
-
-Complete the following steps to start a new project (NEW-PROJECT-NAME) with starter packages, folders and files:
-
-1. Clone this repository to your local machine `git clone https://github.com/jenna-chestnut/express-boilerplate.git NEW-PROJECTS-NAME`
-2. `cd` into the cloned repository
-3. Make a fresh start of the git history for this project with `rm -rf .git && git init`
-4. Install the node dependencies `npm install`
-5. Move the example Environment file to `.env` that will be ignored by git and read by the express server `mv example.env .env`
-6. Edit the contents of the `package.json` to use NEW-PROJECT-NAME instead of `"name": "express-boilerplate",`
+### Full Stack Application using Express, Knex, NodeJS, and React.
 
 ---
 
-## Scripts
+### API ENDPOINTS
 
-Start the application `npm start`
+```
+/api/auth/token
+-- POST - login user
 
-Start nodemon for the application `npm run dev`
+/api/user
+-- POST - register/create a user
 
-Run the tests `npm test`
+/api/orders
+-- POST - creates a new order and adds it to order and order_items table 
 
-Run a watching test environment `npm run watch`
+/api/admin
+-- GET - get all orders from all users
 
----
-
-## Deploying
-
-When your new project is ready for deployment, add a new Heroku application with `heroku create`.  
-This will make a new git remote called "heroku" and you can then `npm run deploy` which will push to this remote's main branch.
+This is the server side of MASS API. I used Node/Express to build the API. PostgreSQL/Knex was used for the database.

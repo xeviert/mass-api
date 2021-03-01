@@ -5,7 +5,8 @@ const UserService = require("./user-service");
 const userRouter = express.Router();
 const jsonBodyParser = express.json();
 
-userRouter.post("/", jsonBodyParser, async (req, res, next) => {
+userRouter
+  .post("/", jsonBodyParser, async (req, res, next) => {
   const { password, phone_number, role } = req.body;
 
   for (const field of ["phone_number", "password"])
