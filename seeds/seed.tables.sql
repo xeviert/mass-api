@@ -1,5 +1,10 @@
 BEGIN;
 
+-- INSERT INTO users (phone_number, password, role)
+-- VALUES
+--     ('(713) 000-1234', 'pass', admin)
+--     ('(512) 111-1234', 'pass')
+
 INSERT INTO items (id, product)
 VALUES
     (1, 'Snack Kit'),

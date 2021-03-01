@@ -57,6 +57,7 @@ authRouter
     const payload = {
       user_id: req.users.id,
       phone_number: req.users.phone_number,
+      role: req.users.role,
     };
     res.send({
       authToken: AuthService.createJwt(sub, payload),
