@@ -20,5 +20,6 @@
 
 /api/admin
 -- GET - get all orders from all users
+```
 
 This is the server side of MASS API. I used Node/Express to build the API. PostgreSQL/Knex was used for the database.
