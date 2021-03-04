@@ -66,6 +66,7 @@ If admin is logged in, admin will be able to see a list of orders with the items
     "order_items": {
         "5": 2,
         "2": 7
+    }
   }
 
 
