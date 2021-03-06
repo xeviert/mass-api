@@ -25,13 +25,12 @@ describe("User Endpoints", function () {
   describe(`POST /api/user`, () => {
     beforeEach("insert users", () => helpers.seedUsers(db, testUsers));
 
-    const requiredFields = ["username", "password", "name"];
+    const requiredFields = ["phone_number", "password"];
 
     requiredFields.forEach((field) => {
       const registerAttemptBody = {
-        username: "test username",
-        password: "test password",
-        name: "test name",
+        phone_number: "test username",
+        password: "11AAaa!!",
       };
 
       it(`responds with 400 required error when '${field}' is missing`, () => {
@@ -48,9 +47,8 @@ describe("User Endpoints", function () {
 
     it(`responds 400 'Password be longer than 8 characters' when empty password`, () => {
       const userShortPassword = {
-        username: "test username",
-        password: "1234567",
-        name: "test name",
+        phone_number: "test username",
+        password: "11AAaa!!",
       };
       return supertest(app)
         .post("/api/user")
@@ -72,9 +70,8 @@ describe("User Endpoints", function () {
 
     it(`responds 400 error when password starts with spaces`, () => {
       const userPasswordStartsSpaces = {
-        username: "test username",
-        password: " 1Aa!2Bb@",
-        name: "test name",
+        phone_number: "test username",
+        password: "11AAaa!!",
       };
       return supertest(app)
         .post("/api/user")
@@ -86,9 +83,8 @@ describe("User Endpoints", function () {
 
     it(`responds 400 error when password ends with spaces`, () => {
       const userPasswordEndsSpaces = {
-        username: "test username",
-        password: "1Aa!2Bb@ ",
-        name: "test name",
+        phone_number: "test username",
+        password: "11AAaa!!",
       };
       return supertest(app)
         .post("/api/user")
@@ -114,9 +110,8 @@ describe("User Endpoints", function () {
 
     it(`responds 400 'User name already taken' when username isn't unique`, () => {
       const duplicateUser = {
-        username: testUser.username,
+        phone_number: testUser.phone_number,
         password: "11AAaa!!",
-        name: "test name",
       };
       return supertest(app)
         .post("/api/user")
@@ -127,9 +122,8 @@ describe("User Endpoints", function () {
     describe(`Given a valid user`, () => {
       it(`responds 201, serialized user with no password`, () => {
         const newUser = {
-          username: "test username",
+          phone_number: "test username",
           password: "11AAaa!!",
-          name: "test name",
         };
         return supertest(app)
           .post("/api/user")
@@ -146,9 +140,8 @@ describe("User Endpoints", function () {
 
       it(`stores the new user in db with bcryped password`, () => {
         const newUser = {
-          username: "test username",
+          phone_number: "test username",
           password: "11AAaa!!",
-          name: "test name",
         };
         return supertest(app)
           .post("/api/user")
@@ -169,66 +162,6 @@ describe("User Endpoints", function () {
                 expect(compareMatch).to.be.true;
               })
           );
-      });
-
-      it(`inserts 1 language with words for the new user`, () => {
-        const newUser = {
-          username: "test username",
-          password: "11AAaa!!",
-          name: "test name",
-        };
-        const expectedList = {
-          name: "Italian",
-          total_score: 0,
-          words: [
-            { original: "mangiamo", translation: "lets eat" },
-            { original: "insalata", translation: "salad" },
-            { original: "vino", translation: "wine" },
-            { original: "pesce", translation: "fish" },
-            { original: "pane", translation: "bread" },
-            { original: "caffè", translation: "an espresso" },
-            { original: "è delizioso", translation: "this is delicious" },
-            { original: "grazie", translation: "thank you" },
-          ],
-        };
-        return supertest(app)
-          .post("/api/user")
-          .send(newUser)
-          .then((res) =>
-            /*
-            get languages and words for user that were inserted to db
-            */
-            db
-              .from("language")
-              .select(
-                "language.*",
-                db.raw(
-                  `COALESCE(
-                  json_agg(DISTINCT word)
-                  filter(WHERE word.id IS NOT NULL),
-                  '[]'
-                ) AS words`
-                )
-              )
-              .leftJoin("word", "word.language_id", "language.id")
-              .groupBy("language.id")
-              .where({ user_id: res.body.id })
-          )
-          .then((dbLists) => {
-            expect(dbLists).to.have.length(1);
-
-            expect(dbLists[0].name).to.eql(expectedList.name);
-            expect(dbLists[0].total_score).to.eql(0);
-
-            const dbWords = dbLists[0].words;
-            expect(dbWords).to.have.length(expectedList.words.length);
-
-            expectedList.words.forEach((expectedWord, w) => {
-              expect(dbWords[w].original).to.eql(expectedWord.original);
-              expect(dbWords[w].translation).to.eql(expectedWord.translation);
-              expect(dbWords[w].memory_value).to.eql(1);
-            });
-          });
       });
     });
   });

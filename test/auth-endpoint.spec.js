@@ -25,11 +25,11 @@ describe("Auth Endpoints", function () {
   describe(`POST /api/auth/token`, () => {
     beforeEach("insert users", () => helpers.seedUsers(db, testUsers));
 
-    const requiredFields = ["username", "password"];
+    const requiredFields = ["phone_number", "password"];
 
     requiredFields.forEach((field) => {
       const loginAttemptBody = {
-        username: testUser.username,
+        phone_number: testUser.phone_number,
         password: testUser.password,
       };
 
@@ -45,35 +45,35 @@ describe("Auth Endpoints", function () {
       });
     });
 
-    it(`responds 400 'invalid username or password' when bad username`, () => {
-      const userInvalidUser = { username: "user-not", password: "existy" };
+    it(`responds 400 'invalid phone_number or password' when bad phone_number`, () => {
+      const userInvalidUser = { phone_number: "user-not", password: "existy" };
       return supertest(app)
         .post("/api/auth/token")
         .send(userInvalidUser)
-        .expect(400, { error: `Incorrect username or password` });
+        .expect(400, { error: `Incorrect phone_number or password` });
     });
 
-    it(`responds 400 'invalid username or password' when bad password`, () => {
+    it(`responds 400 'invalid phone_number or password' when bad password`, () => {
       const userInvalidPass = {
-        username: testUser.username,
+        phone_number: testUser.phone_number,
         password: "incorrect",
       };
       return supertest(app)
         .post("/api/auth/token")
         .send(userInvalidPass)
-        .expect(400, { error: `Incorrect username or password` });
+        .expect(400, { error: `Incorrect phone_number or password` });
     });
 
     it(`responds 200 and JWT auth token using secret when valid credentials`, () => {
       const userValidCreds = {
-        username: testUser.username,
+        phone_number: testUser.phone_number,
         password: testUser.password,
       };
       const expectedToken = jwt.sign(
         { user_id: testUser.id, name: testUser.name },
         process.env.JWT_SECRET,
         {
-          subject: testUser.username,
+          subject: testUser.phone_number,
           expiresIn: process.env.JWT_EXPIRY,
           algorithm: "HS256",
         }
@@ -98,7 +98,7 @@ describe("Auth Endpoints", function () {
         { user_id: testUser.id, name: testUser.name },
         process.env.JWT_SECRET,
         {
-          subject: testUser.username,
+          subject: testUser.phone_number,
           expiresIn: process.env.JWT_EXPIRY,
           algorithm: "HS256",
         }
