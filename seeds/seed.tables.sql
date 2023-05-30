@@ -22,7 +22,7 @@ VALUES
     (13, 'School Supplies'),
     (14, 'Notepad and Pens'),
     (15, 'Hat, Gloves, Scarve'),
-    (16, 'Sweater/Jacket');
-
+    (16, 'Sweater/Jacket'),
+    (17, 'Naloxone(Narcan)');
 
 COMMIT;
