@@ -12,5 +12,3 @@ app.set('db', db);
 app.listen(PORT, () => {
   console.log(`Express server is listening at http://localhost:${PORT}`);
 });
-
-app.get('/', (req, res) => res.send('Deployed! 🚀'));
