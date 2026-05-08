@@ -1,9 +1,26 @@
-const xss = require("xss");
+import xss from "xss";
+import type { Stores } from "../store";
+import type { Order, OrderStatus } from "../types";
 
-const VALID_STATUS = new Set(["open", "fulfilled"]);
+const VALID_STATUS: ReadonlySet<OrderStatus> = new Set<OrderStatus>(["open", "fulfilled"]);
+
+export interface SerializedOrder {
+  id: number;
+  user_id: number;
+  location: string;
+  note: string | null;
+  status: OrderStatus;
+  posted: string;
+  items: Array<{
+    item_id: number;
+    quantity: number;
+    slug: string | null;
+    name: string | null;
+  }>;
+}
 
 const OrdersService = {
-  validateNewOrder(body, stores) {
+  validateNewOrder(body: Record<string, unknown>, stores: Stores): string | null {
     if (!body.location || typeof body.location !== "string") {
       return "Missing 'location' in request body";
     }
@@ -12,19 +29,32 @@ const OrdersService = {
     }
     for (const entry of body.items) {
       if (!entry || typeof entry !== "object") return "Each item must be an object";
-      const { item_id, quantity } = entry;
+      const { item_id, quantity } = entry as { item_id: unknown; quantity: unknown };
       if (!Number.isInteger(item_id)) return "Each item must include integer 'item_id'";
-      if (!Number.isInteger(quantity) || quantity < 1) {
+      if (!Number.isInteger(quantity) || (quantity as number) < 1) {
         return "Each item must include integer 'quantity' >= 1";
       }
-      if (!stores.items.findById(item_id)) {
+      if (!stores.items.findById(item_id as number)) {
         return `item_id ${item_id} does not exist`;
       }
     }
     return null;
   },
 
-  insertOrder(stores, { user_id, location, note, items }) {
+  insertOrder(
+    stores: Stores,
+    {
+      user_id,
+      location,
+      note,
+      items,
+    }: {
+      user_id: number;
+      location: string;
+      note?: string | null;
+      items: Array<{ item_id: number; quantity: number }>;
+    },
+  ): Promise<Order> {
     return stores.orders.insert({
       user_id,
       location,
@@ -35,7 +65,7 @@ const OrdersService = {
     });
   },
 
-  serialize(order, stores) {
+  serialize(order: Order, stores: Stores): SerializedOrder {
     return {
       id: order.id,
       user_id: order.user_id,
@@ -55,24 +85,24 @@ const OrdersService = {
     };
   },
 
-  listForUser(stores, user_id) {
+  listForUser(stores: Stores, user_id: number): Order[] {
     return stores.orders.filter((o) => o.user_id === user_id);
   },
 
-  getById(stores, id) {
+  getById(stores: Stores, id: number | string): Order | null {
     return stores.orders.findById(id);
   },
 
-  validateStatus(status) {
-    if (!VALID_STATUS.has(status)) {
+  validateStatus(status: unknown): string | null {
+    if (typeof status !== "string" || !VALID_STATUS.has(status as OrderStatus)) {
       return `status must be one of: ${[...VALID_STATUS].join(", ")}`;
     }
     return null;
   },
 
-  setStatus(stores, id, status) {
+  setStatus(stores: Stores, id: number | string, status: OrderStatus): Promise<Order | null> {
     return stores.orders.update(id, { status });
   },
 };
 
-module.exports = OrdersService;
+export default OrdersService;

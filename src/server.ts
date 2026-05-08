@@ -1,10 +1,10 @@
-require("dotenv").config();
-const app = require("./app");
-const config = require("./config");
-const stores = require("./store");
-const seed = require("./store/seed");
+import "dotenv/config";
+import app from "./app";
+import config from "./config";
+import stores from "./store";
+import seed from "./store/seed";
 
-async function start() {
+async function start(): Promise<void> {
   await stores.init();
   await seed.run({ stores, config });
 

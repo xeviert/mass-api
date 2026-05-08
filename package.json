@@ -2,12 +2,12 @@
   "name": "mass-api",
   "version": "1.0.0",
   "description": "",
-  "main": "src/server.js",
+  "main": "dist/server.js",
   "scripts": {
-    "test": "mocha --require test/setup.js",
-    "watch": "npm t -- --watch",
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts",
     "predeploy": "npm audit",
     "deploy": "git push heroku main"
   },
@@ -28,12 +28,20 @@
     "xss": "^1.0.15"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^25.6.2",
     "chai": "^6.2.2",
     "eslint": "^10.0.2",
     "eslint-config-prettier": "^10.1.8",
     "mocha": "^11.7.5",
     "nodemon": "^3.1.14",
     "prettier": "3.8.1",
-    "supertest": "^7.2.2"
+    "supertest": "^7.2.2",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
   }
 }

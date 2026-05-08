@@ -1,7 +1,24 @@
-const xss = require("xss");
+import xss from "xss";
+import type { Stores } from "../store";
+import type { Order } from "../types";
+
+export interface HydratedOrder {
+  id: number;
+  posted: string;
+  status: Order["status"];
+  location: string;
+  note: string | null;
+  requester: { id: number; phone_number: string } | null;
+  items: Array<{
+    item_id: number;
+    quantity: number;
+    slug: string | null;
+    name: string | null;
+  }>;
+}
 
 const AdminService = {
-  hydrateOrder(order, stores) {
+  hydrateOrder(order: Order, stores: Stores): HydratedOrder {
     const requester = stores.users.findById(order.user_id);
     return {
       id: order.id,
@@ -24,18 +41,18 @@ const AdminService = {
     };
   },
 
-  getAllOrders(stores) {
+  getAllOrders(stores: Stores): HydratedOrder[] {
     return stores.orders.all().map((o) => AdminService.hydrateOrder(o, stores));
   },
 
-  getById(stores, id) {
+  getById(stores: Stores, id: number | string): HydratedOrder | null {
     const order = stores.orders.findById(id);
     return order ? AdminService.hydrateOrder(order, stores) : null;
   },
 
-  deleteOrder(stores, id) {
+  deleteOrder(stores: Stores, id: number | string): Promise<boolean> {
     return stores.orders.remove(id);
   },
 };
 
-module.exports = AdminService;
+export default AdminService;

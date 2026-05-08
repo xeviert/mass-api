@@ -1,4 +1,11 @@
-const ITEM_SEED = [
+import type { JsonStore } from "./json-store";
+import type { Item, User } from "../types";
+import type { Stores } from "./index";
+import type config from "../config";
+
+type Config = typeof config;
+
+export const ITEM_SEED: Omit<Item, "id" | "created_at">[] = [
   { slug: "snack-kit", name: "Snack Kit", blurb: "Granola bars, nuts, water", icon: "Cookie", category: "Food" },
   { slug: "socks-underwear", name: "Socks & Underwear", blurb: "Fresh basics", icon: "Shirt", category: "Clothing & Warmth" },
   { slug: "walking-shoes", name: "Walking Shoes", blurb: "Sturdy, comfortable", icon: "Footprints", category: "Clothing & Warmth" },
@@ -18,14 +25,14 @@ const ITEM_SEED = [
   { slug: "naloxone", name: "Naloxone (Narcan)", blurb: "Opioid overdose reversal", icon: "HeartPulse", category: "Harm Reduction" },
 ];
 
-async function seedItems(itemsStore) {
+async function seedItems(itemsStore: JsonStore<Item>): Promise<void> {
   if (itemsStore.all().length > 0) return;
   for (const item of ITEM_SEED) {
     await itemsStore.insert(item);
   }
 }
 
-async function seedAdmin(usersStore, adminPhone) {
+async function seedAdmin(usersStore: JsonStore<User>, adminPhone: string | null): Promise<void> {
   if (!adminPhone) return;
   const existing = usersStore.find((u) => u.phone_number === adminPhone);
   if (existing) {
@@ -37,13 +44,13 @@ async function seedAdmin(usersStore, adminPhone) {
   }
   console.log(
     `SEED_ADMIN_PHONE=${adminPhone} is set, but no user with that phone exists yet. ` +
-      `Register that phone via POST /api/user and it will be promoted on next startup.`
+      `Register that phone via POST /api/user and it will be promoted on next startup.`,
   );
 }
 
-async function run({ stores, config }) {
+export async function run({ stores, config }: { stores: Stores; config: Config }): Promise<void> {
   await seedItems(stores.items);
   await seedAdmin(stores.users, config.SEED_ADMIN_PHONE);
 }
 
-module.exports = { run, ITEM_SEED };
+export default { run, ITEM_SEED };

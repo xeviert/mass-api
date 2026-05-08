@@ -1,6 +1,7 @@
-const express = require("express");
-const AuthService = require("./auth-service");
-const { requireAuth } = require("../middleware/jwt-auth");
+import express from "express";
+import AuthService from "./auth-service";
+import { requireAuth } from "../middleware/jwt-auth";
+import type { JwtPayload } from "../types";
 
 const authRouter = express.Router();
 const jsonBodyParser = express.json();
@@ -8,14 +9,13 @@ const jsonBodyParser = express.json();
 authRouter
   .route("/token")
   .post(jsonBodyParser, async (req, res, next) => {
-    const { phone_number, password } = req.body;
+    const { phone_number, password } = req.body ?? {};
     const loginUser = { phone_number, password };
 
     for (const [key, value] of Object.entries(loginUser)) {
       if (value == null) {
-        return res.status(400).json({
-          error: `Missing '${key}' in request body`,
-        });
+        res.status(400).json({ error: `Missing '${key}' in request body` });
+        return;
       }
     }
 
@@ -24,20 +24,22 @@ authRouter
       const dbUser = AuthService.getUserWithPhoneNumber(stores, loginUser.phone_number);
 
       if (!dbUser) {
-        return res.status(400).json({ error: "Incorrect username or pw" });
+        res.status(400).json({ error: "Incorrect username or pw" });
+        return;
       }
 
       const compareMatch = await AuthService.comparePasswords(
         loginUser.password,
-        dbUser.password_hash
+        dbUser.password_hash,
       );
 
       if (!compareMatch) {
-        return res.status(400).json({ error: "Incorrect username or pw" });
+        res.status(400).json({ error: "Incorrect username or pw" });
+        return;
       }
 
       const sub = dbUser.phone_number;
-      const payload = {
+      const payload: JwtPayload = {
         user_id: dbUser.id,
         phone_number: dbUser.phone_number,
         role: dbUser.role,
@@ -48,13 +50,14 @@ authRouter
     }
   })
   .put(requireAuth, (req, res) => {
-    const sub = req.user.phone_number;
-    const payload = {
-      user_id: req.user.id,
-      phone_number: req.user.phone_number,
-      role: req.user.role,
+    const user = req.user!;
+    const sub = user.phone_number;
+    const payload: JwtPayload = {
+      user_id: user.id,
+      phone_number: user.phone_number,
+      role: user.role,
     };
     res.send({ authToken: AuthService.createJwt(sub, payload) });
   });
 
-module.exports = authRouter;
+export default authRouter;
