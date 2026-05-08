@@ -1,9 +1,20 @@
+import bcrypt from "bcrypt";
 import type { JsonStore } from "./json-store";
-import type { Item, User, InventoryRecord } from "../types";
+import type {
+  Item,
+  MoneyDonation,
+  Order,
+  SuppliesDonation,
+  User,
+  InventoryRecord,
+} from "../types";
 import type { Stores } from "./index";
 import type config from "../config";
 
 type Config = typeof config;
+const DEMO_PASSWORD = "demo";
+const DEMO_REQUESTER_PHONE = "5555551111";
+const DEMO_ADMIN_PHONE = "5555550000";
 
 export const ITEM_SEED: Omit<Item, "id" | "created_at">[] = [
   { slug: "snack-kit", name: "Snack Kit", blurb: "Granola bars, nuts, water", icon: "Cookie", category: "Food" },
@@ -48,6 +59,21 @@ async function seedAdmin(usersStore: JsonStore<User>, adminPhone: string | null)
   );
 }
 
+async function seedDemoUsers(usersStore: JsonStore<User>): Promise<void> {
+  if (usersStore.all().length > 0) return;
+  const password_hash = await bcrypt.hash(DEMO_PASSWORD, 12);
+  await usersStore.insert({
+    phone_number: DEMO_ADMIN_PHONE,
+    password_hash,
+    role: "admin",
+  });
+  await usersStore.insert({
+    phone_number: DEMO_REQUESTER_PHONE,
+    password_hash,
+    role: "user",
+  });
+}
+
 async function seedInventory(
   inventoryStore: JsonStore<InventoryRecord>,
   itemsStore: JsonStore<Item>,
@@ -63,9 +89,113 @@ async function seedInventory(
   }
 }
 
+async function seedDemoInventory(
+  inventoryStore: JsonStore<InventoryRecord>,
+  itemsStore: JsonStore<Item>,
+): Promise<void> {
+  const countsBySlug: Record<string, number> = {
+    "snack-kit": 8,
+    "socks-underwear": 4,
+    "walking-shoes": 1,
+    "pads-tampons": 5,
+    "first-aid": 6,
+    dental: 7,
+    "deodorant-soap": 5,
+    earplugs: 12,
+    ppe: 9,
+    blanket: 2,
+    diapers: 1,
+    formula: 2,
+    school: 3,
+    notepad: 10,
+    "hat-gloves-scarf": 3,
+    jacket: 1,
+    naloxone: 4,
+  };
+  for (const item of itemsStore.all()) {
+    const row = inventoryStore.find((r) => r.item_id === item.id);
+    if (!row || row.on_hand !== 0) continue;
+    await inventoryStore.update(row.id, {
+      on_hand: countsBySlug[item.slug] ?? 0,
+      updated_at: new Date().toISOString(),
+    });
+  }
+}
+
+function itemId(itemsStore: JsonStore<Item>, slug: string): number {
+  const item = itemsStore.find((i) => i.slug === slug);
+  if (!item) throw new Error(`Missing seeded item '${slug}'`);
+  return item.id;
+}
+
+async function seedDemoOrders(stores: Stores): Promise<void> {
+  if (stores.orders.all().length > 0) return;
+  const requester = stores.users.find((u) => u.phone_number === DEMO_REQUESTER_PHONE);
+  if (!requester) return;
+  const now = Date.now();
+  const orders: Array<Omit<Order, "id" | "created_at">> = [
+    {
+      user_id: requester.id,
+      location: "Pioneer Square, near the pergola",
+      note: "Two care packages for outreach drop-off.",
+      status: "open",
+      posted: new Date(now - 1000 * 60 * 22).toISOString(),
+      items: [
+        { item_id: itemId(stores.items, "snack-kit"), quantity: 2 },
+        { item_id: itemId(stores.items, "socks-underwear"), quantity: 2 },
+        { item_id: itemId(stores.items, "blanket"), quantity: 1 },
+      ],
+    },
+    {
+      user_id: requester.id,
+      location: "12th Ave & E Jefferson, outside library",
+      note: "Warm layers requested before evening.",
+      status: "fulfilled",
+      posted: new Date(now - 1000 * 60 * 60 * 5).toISOString(),
+      items: [
+        { item_id: itemId(stores.items, "hat-gloves-scarf"), quantity: 1 },
+        { item_id: itemId(stores.items, "jacket"), quantity: 1 },
+      ],
+    },
+  ];
+  for (const order of orders) {
+    await stores.orders.insert(order);
+  }
+}
+
+async function seedDemoDonations(stores: Stores): Promise<void> {
+  if (stores.donations.all().length > 0) return;
+  const requester = stores.users.find((u) => u.phone_number === DEMO_REQUESTER_PHONE);
+  const donations: Array<
+    | Omit<SuppliesDonation, "id" | "created_at">
+    | Omit<MoneyDonation, "id" | "created_at">
+  > = [
+    {
+      kind: "supplies",
+      user_id: requester?.id ?? null,
+      items: [
+        { item_id: itemId(stores.items, "snack-kit"), quantity: 6 },
+        { item_id: itemId(stores.items, "dental"), quantity: 4 },
+      ],
+    },
+    {
+      kind: "money",
+      user_id: null,
+      amount_cents: 2500,
+    },
+  ];
+  for (const donation of donations) {
+    await stores.donations.insert(donation);
+  }
+}
+
 export async function run({ stores, config }: { stores: Stores; config: Config }): Promise<void> {
   await seedItems(stores.items);
   await seedInventory(stores.inventory, stores.items);
+  await seedDemoUsers(stores.users);
+  await seedDemoInventory(stores.inventory, stores.items);
+  await seedDemoOrders(stores);
+  await seedDemoDonations(stores);
   await seedAdmin(stores.users, config.SEED_ADMIN_PHONE);
 }
 

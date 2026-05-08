@@ -16,15 +16,17 @@ if (!process.env.JWT_SECRET) {
 const config = {
   PORT: process.env.PORT ? Number(process.env.PORT) : 8080,
   NODE_ENV,
+  CLIENT_ORIGIN: process.env.CLIENT_ORIGIN || null,
   DATA_DIR: process.env.DATA_DIR || path.join(__dirname, "..", "data"),
   JWT_SECRET: process.env.JWT_SECRET || "mass-jwt-dev-secret",
   JWT_EXPIRY: process.env.JWT_EXPIRY || "3h",
-  SEED_ADMIN_PHONE: process.env.SEED_ADMIN_PHONE || null,
+  SEED_ADMIN_PHONE: process.env.SEED_ADMIN_PHONE || "5555550000",
 };
 
 export default config;
 export const {
   PORT,
+  CLIENT_ORIGIN,
   DATA_DIR,
   JWT_SECRET,
   JWT_EXPIRY,
