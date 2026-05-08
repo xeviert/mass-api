@@ -8,6 +8,8 @@ import userRouter from "./user/user-router";
 import ordersRouter from "./orders/orders-router";
 import adminRouter from "./admin/admin-router";
 import itemsRouter from "./items/items-router";
+import inventoryRouter from "./inventory/inventory-router";
+import donationsRouter from "./donations/donations-router";
 
 const morganOption = NODE_ENV === "production" ? "tiny" : "common";
 
@@ -20,6 +22,8 @@ app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/items", itemsRouter);
+app.use("/api/inventory", inventoryRouter);
+app.use("/api/donations", donationsRouter);
 app.use("/api/orders", ordersRouter);
 app.use("/api/admin", adminRouter);
 

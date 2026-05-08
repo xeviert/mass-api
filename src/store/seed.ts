@@ -1,5 +1,5 @@
 import type { JsonStore } from "./json-store";
-import type { Item, User } from "../types";
+import type { Item, User, InventoryRecord } from "../types";
 import type { Stores } from "./index";
 import type config from "../config";
 
@@ -48,8 +48,24 @@ async function seedAdmin(usersStore: JsonStore<User>, adminPhone: string | null)
   );
 }
 
+async function seedInventory(
+  inventoryStore: JsonStore<InventoryRecord>,
+  itemsStore: JsonStore<Item>,
+): Promise<void> {
+  const existing = new Set(inventoryStore.all().map((r) => r.item_id));
+  for (const item of itemsStore.all()) {
+    if (existing.has(item.id)) continue;
+    await inventoryStore.insert({
+      item_id: item.id,
+      on_hand: 0,
+      updated_at: new Date().toISOString(),
+    });
+  }
+}
+
 export async function run({ stores, config }: { stores: Stores; config: Config }): Promise<void> {
   await seedItems(stores.items);
+  await seedInventory(stores.inventory, stores.items);
   await seedAdmin(stores.users, config.SEED_ADMIN_PHONE);
 }
 
