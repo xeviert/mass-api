@@ -1,78 +1,80 @@
 # MASS API - Mutual Aid & Shared Services
 
-## Created for MASS Client
-## Live App: https://mass-client.vercel.app
-## Client Repo: https://github.com/xeviert/mass-client
+API server for the MASS app — a mutual aid platform where users can request supplies and admins can fulfill orders.
 
+## Storage (demo)
 
-### Full Stack Application using Express, Knex, NodeJS, and React.
+This is a demo build. Data is persisted as **JSON files** in `./data/`:
+- `users.json`
+- `items.json`
+- `orders.json`
 
-### Description
+Files are seeded on first start (the catalog of supply items comes from `src/store/seed.js`). The `data/` directory is gitignored and recreated as needed.
 
-This project is for the use of a mutual aid organization. Mutual aid is direct, neighbor-to-neighbor rather than having a large organization as a barrier between people who have things to offer and people who have things they need. It is based on the equality of giving and receiving and recognizes that everyone at some point is able to offer help of some kind and will need to receive it.
-
-Anyone can go to the website and look at a collection of useful public resources that may help those in need. It links to other mutual aid organizations as well as community fridges, shelters, and domestic abuse resources.
-
-User registers with phone number and password only. This prevents user from giving out personal details and keeping the user as anonymous as possible. Once logged in, the user is able to submit a list of things needed as well as a location of where the mutual aid organization is to drop off the items submitted.
-
-If admin is logged in, admin will be able to see a list of orders with the items requested from different users.
-
----
-
-### API ENDPOINTS
+## Running locally
 
 ```
-/api/auth/token
--- POST - login user
-
-// req.body
-  {
-    username: String,
-    password: String
-  }
-
-// res.body
-  {
-    authToken: String
-  }
-
-
-
-/api/user
--- POST - register/create a user
-
-  {
-    phone_number: String,
-    password: String
-  }
-
-
-
-/api/orders
--- POST - creates a new order and adds it to order and order_items table 
-
-// req.body
-  {
-    "location": String,
-    "order_items": {
-        String: Int,
-        String: Int
-    }
-  }
-
-// example
-  {
-    "location": "123 Fake St.",
-    "order_items": {
-        "5": 2,
-        "2": 7
-    }
-  }
-
-
-
-/api/admin
--- GET - get all orders from all users
+cp example.env .env
+# edit .env, set JWT_SECRET (and optionally SEED_ADMIN_PHONE)
+npm install
+npm run dev
 ```
 
-This is the server side of MASS API. I used Node/Express to build the API. PostgreSQL/Knex was used for the database.
+The server boots on `http://localhost:8080`.
+
+### Bootstrapping an admin
+
+Set `SEED_ADMIN_PHONE` in `.env` to a phone number, register that account via `POST /api/user`, then restart the server. The user with that phone number will be promoted to `role: "admin"`.
+
+## API Endpoints
+
+### Auth
+```
+POST /api/user
+  body: { phone_number, password }
+  -> 201 { id, phone_number, role }
+
+POST /api/auth/token
+  body: { phone_number, password }
+  -> { authToken }
+
+PUT  /api/auth/token            (auth required — refresh)
+  -> { authToken }
+
+GET  /api/user/me               (auth required)
+  -> { id, phone_number, role }
+```
+
+### Items (catalog)
+```
+GET    /api/items                       (public)
+POST   /api/items                       (admin)
+  body: { slug, name, blurb, icon, category }
+PATCH  /api/items/:id                   (admin)
+DELETE /api/items/:id                   (admin)
+GET    /api/items/:id                   (public)
+```
+
+### Orders
+```
+GET    /api/orders                      (auth — user's own orders)
+POST   /api/orders                      (auth)
+  body: {
+    location: string,
+    note?: string,
+    items: [{ item_id: number, quantity: number }, ...]
+  }
+GET    /api/orders/:id                  (auth — owner or admin)
+PATCH  /api/orders/:id                  (auth — owner or admin)
+  body: { status: "open" | "fulfilled" }
+```
+
+### Admin
+```
+GET    /api/admin/orders                (admin)
+GET    /api/admin/orders/:id            (admin)
+DELETE /api/admin/orders/:id            (admin)
+```
+
+## Stack
+Node + Express 5, JSON-file storage, JWT auth (bcrypt + jsonwebtoken).

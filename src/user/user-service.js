@@ -1,36 +1,21 @@
 const bcrypt = require("bcrypt");
 
-const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/;
-
 const UserService = {
-  hasUserWithPhoneNumber(db, phone_number) {
-    return db("users")
-      .where({ phone_number })
-      .first()
-      .then((user) => !!user);
+  hasUserWithPhoneNumber(stores, phone_number) {
+    return !!stores.users.find((u) => u.phone_number === phone_number);
   },
 
-  insertUser(db, newUser) {
-    return db
-      .insert(newUser)
-      .into("users")
-      .returning("*")
-      .then(([user]) => user);
+  insertUser(stores, newUser) {
+    return stores.users.insert(newUser);
   },
 
   validatePassword(password) {
-    // if (password.length < 8) {
-    //   return "Password must be longer than 8 characters";
-    // }
-    // if (password.length > 72) {
-    //   return "Password must be less than 72 characters";
-    // }
-    // if (password.startsWith(" ") || password.endsWith(" ")) {
-    //   return "Password must not start or end with empty spaces";
-    // }
-    // if (!REGEX_UPPER_LOWER_NUMBER_SPECIAL.test(password)) {
-    //   return "Password must contain one upper case, lower case, number and special character";
-    // }
+    if (typeof password !== "string" || password.length === 0) {
+      return "Password is required";
+    }
+    if (password.length > 72) {
+      return "Password must be 72 characters or fewer";
+    }
     return null;
   },
 
@@ -42,6 +27,7 @@ const UserService = {
     return {
       id: user.id,
       phone_number: user.phone_number,
+      role: user.role || null,
     };
   },
 };

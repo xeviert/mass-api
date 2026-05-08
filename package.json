@@ -2,21 +2,18 @@
   "name": "mass-api",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
     "test": "mocha --require test/setup.js",
     "watch": "npm t -- --watch",
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "migrate": "postgrator --config postgrator-config.js",
-    "migrate:test": "env NODE_ENV=test npm run migrate",
     "predeploy": "npm audit",
-    "deploy": "git push heroku main",
-    "seed:production": "cat ./seeds/seed.tables.sql | heroku pg:psql"
+    "deploy": "git push heroku main"
   },
   "keywords": [],
   "engines": {
-    "node": "12.18.2"
+    "node": ">=18"
   },
   "author": "",
   "license": "ISC",
@@ -27,11 +24,8 @@
     "express": "^5.2.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
-    "knex": "^3.1.0",
     "morgan": "^1.10.1",
-    "pg": "^8.19.0",
-    "xss": "^1.0.15",
-    "postgrator-cli": "^9.1.0"
+    "xss": "^1.0.15"
   },
   "devDependencies": {
     "chai": "^6.2.2",

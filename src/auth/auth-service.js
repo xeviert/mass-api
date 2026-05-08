@@ -3,8 +3,8 @@ const jwt = require("jsonwebtoken");
 const config = require("../config");
 
 const AuthService = {
-  getUserWithPhoneNumber(db, phone_number) {
-    return db("users").where({ phone_number }).first();
+  getUserWithPhoneNumber(stores, phone_number) {
+    return stores.users.find((u) => u.phone_number === phone_number);
   },
 
   comparePasswords(password, hash) {

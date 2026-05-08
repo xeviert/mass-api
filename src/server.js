@@ -1,14 +1,21 @@
+require("dotenv").config();
 const app = require("./app");
-const { PORT, DATABASE_URL } = require("./config");
-const knex = require('knex');
+const config = require("./config");
+const stores = require("./store");
+const seed = require("./store/seed");
 
-const db = knex({
-  client: 'pg',
-  connection: DATABASE_URL
-});
+async function start() {
+  await stores.init();
+  await seed.run({ stores, config });
 
-app.set('db', db);
+  app.locals.stores = stores;
 
-app.listen(PORT, () => {
-  console.log(`Express server is listening at http://localhost:${PORT}`);
+  app.listen(config.PORT, () => {
+    console.log(`Express server is listening at http://localhost:${config.PORT}`);
+  });
+}
+
+start().catch((err) => {
+  console.error("Failed to start server:", err);
+  process.exit(1);
 });

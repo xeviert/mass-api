@@ -11,32 +11,30 @@ authRouter
     const { phone_number, password } = req.body;
     const loginUser = { phone_number, password };
 
-    for (const [key, value] of Object.entries(loginUser))
-      if (value == null)
+    for (const [key, value] of Object.entries(loginUser)) {
+      if (value == null) {
         return res.status(400).json({
           error: `Missing '${key}' in request body`,
         });
+      }
+    }
 
     try {
-      const dbUser = await AuthService.getUserWithPhoneNumber(
-        req.app.get("db"),
-        loginUser.phone_number
-      );
+      const stores = req.app.locals.stores;
+      const dbUser = AuthService.getUserWithPhoneNumber(stores, loginUser.phone_number);
 
-      if (!dbUser)
-        return res.status(400).json({
-          error: "Incorrect username or pw",
-        });
+      if (!dbUser) {
+        return res.status(400).json({ error: "Incorrect username or pw" });
+      }
 
       const compareMatch = await AuthService.comparePasswords(
         loginUser.password,
-        dbUser.password
+        dbUser.password_hash
       );
 
-      if (!compareMatch)
-        return res.status(400).json({
-          error: "Incorrect username or pw",
-        });
+      if (!compareMatch) {
+        return res.status(400).json({ error: "Incorrect username or pw" });
+      }
 
       const sub = dbUser.phone_number;
       const payload = {
@@ -44,24 +42,19 @@ authRouter
         phone_number: dbUser.phone_number,
         role: dbUser.role,
       };
-      res.send({
-        authToken: AuthService.createJwt(sub, payload),
-      });
+      res.send({ authToken: AuthService.createJwt(sub, payload) });
     } catch (error) {
       next(error);
     }
   })
-
   .put(requireAuth, (req, res) => {
-    const sub = req.users.phone_number;
+    const sub = req.user.phone_number;
     const payload = {
-      user_id: req.users.id,
-      phone_number: req.users.phone_number,
-      role: req.users.role,
+      user_id: req.user.id,
+      phone_number: req.user.phone_number,
+      role: req.user.role,
     };
-    res.send({
-      authToken: AuthService.createJwt(sub, payload),
-    });
+    res.send({ authToken: AuthService.createJwt(sub, payload) });
   });
 
 module.exports = authRouter;
